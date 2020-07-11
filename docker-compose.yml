@@ -52,8 +52,6 @@ services:
     ports:
       - "${MONGO3_PORT:-27019}:${MONGO3_PORT:-27019}"
     command: [ "--port", "${MONGO3_PORT:-27019}", "--replSet", "local" ]
-    # entrypoint: [ "/bin/bash", "docker-entrypoint-initdb.d/docker-entrypoint" ]
-    # entrypoint: [ "/usr/bin/env" ]
 
 networks:
   default:
