@@ -1,0 +1,5 @@
+#!/bin/bash
+
+UTILS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+mongo $(. $UTILS_DIR/getConnString) $@

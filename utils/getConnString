@@ -1,0 +1,8 @@
+#!/bin/bash
+
+[[ -f  ".env" ]] && eval $(egrep -v '^#' .env)
+[[ -z "${MONGO1_HOST}" ]] && echo "MONGO1_HOST not set" && exit
+[[ -z "${MONGO2_HOST}" ]] && echo "MONGO2_HOST not set" && exit
+[[ -z "${MONGO3_HOST}" ]] && echo "MONGO3_HOST not set" && exit
+
+echo "mongodb://${MONGO1_HOST}:${MONGO1_PORT:-27017},${MONGO2_HOST}:${MONGO2_PORT:-27018},${MONGO3_HOST}:${MONGO3_PORT:-27019}/test?replicaSet=local"

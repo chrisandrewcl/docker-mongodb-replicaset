@@ -1,0 +1,62 @@
+version: "3.7"
+
+x-image:
+  &mongo-image
+  mongo:${MONGODB_IMAGE_VERSION:-latest}
+
+services:
+  mongo1:
+    image: *mongo-image
+    container_name: mongo1
+    networks:
+      default:
+        aliases:
+          - "${MONGO1_HOST:?err}"
+    environment:
+      - MONGO1_HOST=${MONGO1_HOST:?err}
+      - MONGO2_HOST=${MONGO2_HOST:?err}
+      - MONGO3_HOST=${MONGO3_HOST:?err}
+      - MONGO1_PORT=${MONGO1_PORT:-27017}
+      - MONGO2_PORT=${MONGO2_PORT:-27018}
+      - MONGO3_PORT=${MONGO3_PORT:-27019}
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ${DATA_PATH:-./.local}/data1/db:/data/db
+      - ${DATA_PATH:-./.local}/data1/configdb:/data/configdb
+    ports:
+      - "${MONGO1_PORT:-27017}:${MONGO1_PORT:-27017}"
+    command: [ "--port", "${MONGO1_PORT:-27017}", "--replSet", "local" ]
+  mongo2:
+    image: *mongo-image
+    container_name: mongo2
+    networks:
+      default:
+        aliases:
+          - "${MONGO2_HOST:?err}"
+    volumes:
+      - ${DATA_PATH:-./.local}/data2/db:/data/db
+      - ${DATA_PATH:-./.local}/data2/configdb:/data/configdb
+    ports:
+      - "${MONGO2_PORT:-27018}:${MONGO2_PORT:-27018}"
+    command: [ "--port", "${MONGO2_PORT:-27018}", "--replSet", "local" ]
+  mongo3:
+    image: *mongo-image
+    container_name: mongo3
+    networks:
+      default:
+        aliases:
+          - "${MONGO3_HOST:?err}"
+    volumes:
+      - ${DATA_PATH:-./.local}/data3/db:/data/db
+      - ${DATA_PATH:-./.local}/data3/configdb:/data/configdb
+    ports:
+      - "${MONGO3_PORT:-27019}:${MONGO3_PORT:-27019}"
+    command: [ "--port", "${MONGO3_PORT:-27019}", "--replSet", "local" ]
+    # entrypoint: [ "/bin/bash", "docker-entrypoint-initdb.d/docker-entrypoint" ]
+    # entrypoint: [ "/usr/bin/env" ]
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${MONGODB_SUBNET_CIDR:-172.33.0.0/16}
